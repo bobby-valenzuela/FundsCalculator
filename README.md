@@ -11,7 +11,7 @@ Basically you can enter some items that you find you may be wasting money on. Th
 
 You can then track the amount over a given time and see how much it totals to if you would have saved all or a certain percentage of that money. Next you can see how much that would have been worth if that had been invested into some cryptocurrencies.
 
-This project lives [here](https://github.com/sveltejs/template).
+This project lives [here](https://bobby-valenzuela.github.io/LostSatoshis/).
 
 To bundle up this project:
 
