@@ -1,17 +1,4 @@
 <script>
-	// let name = 'world';
-
-	// const alertYo = ()=> alert('Yooo');
-	// let color = 'Black';
-
-	// const change = ()=> color = 'purple';
-
-	
-	// let firstName = 'John';
-	// let lastName = 'Doe';
-
-	// // Reactive value - updates whenever dependant values change
-	// $: fullName = `${firstName} ${lastName}`;
 
 	// // Reactive statement - executes whenever dependant values change
 	// $: console.log(fullName);
@@ -22,46 +9,94 @@
 	// 	console.log('This too');
 	// }
 
+	///// IMPORTS
+	
 	// Components
 	import Header from "./Header.svelte";
-	import ExpensesTable from "./ExpensesTable.svelte";
-	import AddExpenseForm from "./AddExpenseForm.svelte";
+	import FundsTable from "./FundsTable.svelte";
+	import AddFundForm from "./AddFundForm.svelte";
 	import NotificationBox from './shared/NotificationBox.svelte';
 
 	// Animating
 	import { fade, blur, fly, slide, scale } from 'svelte/transition';
+    
+	// LifeCycle
+	import { onMount, createEventDispatcher, onDestroy } from 'svelte';
+
+	// Store Data
+	import Funds from './stores/Funds';
+	
+	// Old Data Storage
+	// let expenses = [
+	// 	{ name: 'item1', amount : 10.00 },
+	// 	{ name: 'item2', amount : 20.00 },
+	// 	{ name: 'item3', amount : 50.00 }
+	// ];
+	
+	$: funds = $Funds; // Sigil syntax is preferred varation of subscribing/unsubiing below
+	// const unsub = Expenses.subscribe( data => expenses = data ); // Listens for updates to our data
+	// unsub();
+
+
+	onMount( () => {
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			// Initialize Materialize JS functionality
+			const initTooltips = () => {
+				var elems = document.querySelectorAll('.tooltipped');
+				var instances = M.Tooltip.init(elems, { position: 'top' } );
+			};
+			const floatBtns = () => {
+				var elems = document.querySelectorAll('.fixed-action-btn');
+				var options = { toolbarEnabled : true };
+			};
+			setTimeout( ()=>{initTooltips();floatBtns()}, 3000);
+		});
+
+	});
+
+	onDestroy( ()=>{
+		// Will not occur - good place to unsub from store though - if not using sigil syntax
+		// unsub();
+	} );
 
 
 	// Utility
 	let showingNotificationBox = false;
 	let notificationMsg;
 
-	const showNotificationBox = e => {
-		showingNotificationBox = !showingNotificationBox;
-		notificationMsg = e.detail;
+	// Values
+	$: total = +funds.reduce( (acc, cur)=> acc + cur.amount, 0);
+
+	const hideNotificationBox = () => {
+		if(!showingNotificationBox) return;	
+		showingNotificationBox = false;
+		notificationMsg = '';
 	};
 
-	// Main
-	let uneededExpenses = [
-		{ expense: 'item1', amount : 10.00 },
-		{ expense: 'item2', amount : 20.00 },
-		{ expense: 'item3', amount : 50.00 }
-	];
+	const showNotificationBox = (e, msg) =>{
+		if(showingNotificationBox) return;		
+		// Update Msg
+		notificationMsg = e?.detail || msg;
+		// Show Not
+		showingNotificationBox = true;
+		// Hide after 3s
+		setTimeout( () => showingNotificationBox ? showingNotificationBox = false : null, 3000);
+	};
 	
-	const addExpense = e =>{
-		const expense = e.detail;
-		uneededExpenses = [...uneededExpenses, expense]; 	// can't push to array - svelte won't detect change - must re-create array
-		document.getElementById("addExpenseForm").reset();  // clear form
+	// Fund Handling
+	const addFund = e =>{
+		const fund = e.detail;
+		const fundNamePresent = funds.some(e=>e.name === fund.name);
+
+		// funds = [...funds, fund]; 	// can't push to array - svelte won't detect change
+		Funds.update( currentFunds => [...currentFunds, fund ] );
+		document.getElementById("addFundForm").reset();  // clear form
+
+		if ( fundNamePresent ) return showNotificationBox(null,'Fund name already exists. Added anyway.' );
+		showNotificationBox(null,'Fund added!' );
 	};
 
-
-	// document.addEventListener('DOMContentLoaded', function() {
-    //     var elems = document.querySelectorAll('.fixed-action-btn');
-	// 	var options = { toolbarEnabled : true };
-    //     var instances = M.FloatingActionButton.init(elems, options);
-	// 	var instance = M.FloatingActionButton.getInstance(elem);
-
-    // });
 
 </script>
 
@@ -69,26 +104,26 @@
 
 	<Header/>
 
-	<!-- Expenses -->
-	<div class="container expenses">
+	<!-- funds -->
+	<div class="container funds">
 		<div class="row">
 			<div class="col s10 offset-s1">
-				<ExpensesTable {uneededExpenses} />
+				<FundsTable {total} />
 			</div>
 		</div>
 	</div>
 
-	<!-- Add Expense -->
-	<div class="container add-expense">
+	<!-- add fund -->
+	<div class="container add-fund">
 		<div class="row">
 			<div class="col s10 offset-s1">
-				<AddExpenseForm on:addExpense={addExpense} on:showNotificationBox={showNotificationBox} />
+				<AddFundForm on:addFund={addFund} on:showNotificationBox={showNotificationBox}  />
 			</div>
 		</div>
 	</div>
 
 	{#if showingNotificationBox}
-		<NotificationBox {notificationMsg} />
+		<NotificationBox {notificationMsg} on:hideNotificationBox={hideNotificationBox} />
 
 	{/if}
 
@@ -115,7 +150,7 @@
 	}
 	
 	main{
-		background-color: hsla(240deg,20%,90%,1);
+		background-color: hsla(240deg,20%,85%,1);
 		height:100%;
 	}
 	
@@ -123,17 +158,14 @@
 		padding: 15px;
 	}
 	
-	.container.expenses{
+	.container.funds{
 		background-color: hsla(260deg,20%,92%,1);
 	}
 
-	.container.add-expense{
+	.container.add-fund{
 		background-color: hsla(200deg,40%,95%,1);
 	}
 
-	#notificationBox{
-
-	}
 
 
 </style>

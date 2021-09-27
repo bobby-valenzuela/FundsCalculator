@@ -1,28 +1,20 @@
 <script>
 
 import { createEventDispatcher } from 'svelte';
-
 let dispatch = createEventDispatcher();
-let expense;
+
+// export let expenses = [];
+// import Expenses from './stores/Expenses';
+
+let name;
 let amount;
 
-const expenseNameInput = document.getElementById("expenseNameInput");
-const amountInput = document.getElementById("amountInput");
-
-const showError = err =>{
-
-    alert(err);
-    // const notificationBox = document.createElement('div');
-    // notificationBox.id = 'notificationBox';
-    // document.body.insertAdjacentElement('beforeend',notificationBox);
-    const msg = 'test message!';
-    dispatch('showNotificationBox', msg );
-
-};
-
-const addExpense = ()=>{
-    const data = { expense, amount };
-    dispatch('addExpense', data );
+const addFund = ()=>{
+    if (!amount) return;
+    const data = { name, amount };
+    dispatch('addFund', data );
+    // Expenses.update( expenses => [...expenses, data]);
+    name = null; amount = null;
 };
 
 const validateAmount = (e) => {
@@ -31,19 +23,19 @@ const validateAmount = (e) => {
 };
 
 const validateFields = () =>{
-    if ( !expenseNameInput.value ) return showError('expenseName');
-    if ( !amountInput.value ) return showError('amount');
+    if ( !name ) return dispatch('showNotificationBox', 'Please enter a name for this fund' );
+    if ( !amount ) return dispatch('showNotificationBox', 'Please enter an amount' );
 };
 
 
 </script>
 
-<form on:submit|preventDefault={ addExpense } id="addExpenseForm">
+<form on:submit|preventDefault={ addFund } id="addFundForm">
 					
     <div class="row">
         <div class="col s8">
-            <label>Expense
-                <input type="text" bind:value={ expense } placeholder="Snacks, fast food, etc" id="expenseNameInput" required list="suggestions" autocomplete="off">
+            <label>Fund Name
+                <input type="text" bind:value={ name } placeholder="Snacks, fast food, etc" id="nameInput" required list="suggestions" autocomplete="off">
                 <datalist id="suggestions">
                     <option value="Digital Services">Digital Services</option>
                     <option value="Fast Food">Fast Food</option>
@@ -55,7 +47,7 @@ const validateFields = () =>{
 
         <div class="col s2">
             <label>Amount
-                <input type="number" bind:value={ amount } placeholder="$0.00" on:keypress={ validateAmount } id="amountInput" required>
+                <input type="number" step="0.5" min="0.50" max="10000" bind:value={ amount } placeholder="$0.00" on:keypress={ validateAmount } id="amountInput" required>
             </label>
         </div>
 

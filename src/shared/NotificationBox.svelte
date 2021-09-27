@@ -1,17 +1,65 @@
 <script>
-    export const notificationMsg = '';
+// props
+export let notificationMsg = '';
+
+import { createEventDispatcher } from 'svelte';
+let dispatch = createEventDispatcher();
+
+// Animating
+import { fade, blur, fly, slide, scale } from 'svelte/transition';
+
 </script>
 
-<div id="notificationBox">
-    { notificationMsg } yooo;
+<div id="notificationBox" transition:fade="{ {delay: 50, duration: 150 } }">
+
+    <a class="" href="javascript:;" on:click={ ()=> dispatch('hideNotificationBox') }>
+        <i class="material-icons">close</i>
+    </a>
+    
+    { notificationMsg } 
 </div>
 
 <style>
 #notificationBox{
-    /* display: none;; */
-    width: 300px;
-    min-height: 100px;
-    background-color: darkblue;
+    width: 200px;
+    min-height: 50px;
+    background: linear-gradient(to bottom right, #8e6ab3, #121c9c);
     color: white;
+    left: 30px;
+    position: absolute;
+    bottom: 30px;
+    padding: 12px 18px;
+    border-radius: 3px;
+    box-shadow: 1px 2px 1px black, 1px 2px 3px white, 1px 2px 4px #414141ba, 1px 3px 7px 2px #000000c2;
+    position: fixed;
+    transition: 0.1s ease-out all;
+}
+
+#notificationBox:hover{
+    transform: scale(1.003) translateY(-2px);
+    box-shadow: 1px 2px 1px black, 1px 2px 3px white, 1px 2px 4px #414141ba, 0px 3px 11px 4px rgba(0, 0, 0, 0.459);
+}
+
+a{
+    position: absolute;
+    top: -10px;
+    right: -11px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(145deg, #979797, #000000);
+    border-radius: 50%;
+    padding:0px;
+    margin:0px;
+    color:white;
+    box-shadow: 2px 2px 2px #c5c5c5, 2px 2px 4px #0e0e0e;
+    transition: 0.2s ease-out all;
+}
+a i {
+    font-size: 10px;
+    margin: auto;
+    transform: translate(50%, -2px);
+}
+a:hover{
+    transform: scale(1.1);
 }
 </style>
