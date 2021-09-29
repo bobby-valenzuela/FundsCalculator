@@ -29,7 +29,7 @@ const updateFundAmount = idx => {
     if (editingValue <= 0 ) return;
     // Since updating the store returns a truthy value, we can use that in our ternary operator condition - once this executes & updates we can return/update new store
     // Updating the store with new value -> currentFunds[editingId].amount = editingValue
-    Funds.update( currentFunds => ( currentFunds[editingId].amount = editingValue ) ? currentFunds : 0 );
+    Funds.update( currentFunds => ( currentFunds[editingId].amount = +editingValue ) ? currentFunds : 0 );
     editingId = -1;
 };
 
