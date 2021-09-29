@@ -66,7 +66,8 @@
 	let notificationMsg;
 
 	// Values
-	$: total = +funds.reduce( (acc, cur)=> acc + cur.amount, 0);
+	$: total = +funds.reduce( (acc, cur)=> + ( acc + ( cur?.amount ?? 0 ) ), 0);
+	let notificationDuration = 3000;	
 
 	const hideNotificationBox = () => {
 		if(!showingNotificationBox) return;	
@@ -78,10 +79,9 @@
 		if(showingNotificationBox) return;		
 		// Update Msg
 		notificationMsg = e?.detail || msg;
-		// Show Not
 		showingNotificationBox = true;
 		// Hide after 3s
-		setTimeout( () => showingNotificationBox ? showingNotificationBox = false : null, 3000);
+		setTimeout( () => showingNotificationBox ? showingNotificationBox = false : null, notificationDuration);
 	};
 	
 	// Fund Handling
@@ -102,13 +102,16 @@
 
 <main>
 
-	<Header/>
+	<Header>
+		<!-- Basic slot  -->
+		An fund tracking app built on Svelte JS 
+	</Header>
 
 	<!-- funds -->
 	<div class="container funds">
 		<div class="row">
 			<div class="col s10 offset-s1">
-				<FundsTable {total} />
+				<FundsTable {total} on:showNotificationBox={showNotificationBox} />
 			</div>
 		</div>
 	</div>
@@ -122,8 +125,10 @@
 		</div>
 	</div>
 
+
+	<!-- NotificationBox -->
 	{#if showingNotificationBox}
-		<NotificationBox {notificationMsg} on:hideNotificationBox={hideNotificationBox} />
+		<NotificationBox props={ { notificationMsg, notificationDuration, showingNotificationBox } } on:hideNotificationBox={hideNotificationBox} />
 
 	{/if}
 
@@ -156,6 +161,9 @@
 	
 	.container{
 		padding: 15px;
+	}
+	.container:first-of-type{
+		margin-top: 70px;
 	}
 	
 	.container.funds{

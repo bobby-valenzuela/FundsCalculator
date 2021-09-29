@@ -1,22 +1,48 @@
 <script>
-// props
-export let notificationMsg = '';
+///// Props - destructure all 
 
+///// Method 1. Not preferred - destructure from 'props' var
+
+// export let props;
+// let { notificationMsg = '', notificationDuration = 3000, showingNotificationBox = false } = props;
+
+
+///// Method 2. Preferred - destructure $$props - this contains all props passed into this component under $$props.props
+let { notificationMsg = '', notificationDuration = 3000, showingNotificationBox = false } = $$props.props;
+
+// Imports
 import { createEventDispatcher } from 'svelte';
+import { fade, blur, fly, slide, scale } from 'svelte/transition';
+import { tweened } from 'svelte/motion';
+import { expoIn } from 'svelte/easing';                                         // view easing options -> import Easings from 'svelte/easing'; Easings. 
+
 let dispatch = createEventDispatcher();
 
-// Animating
-import { fade, blur, fly, slide, scale } from 'svelte/transition';
+// Tween for progress bar in notification box
+const progress = tweened(0, {                                                   // const progress = tweened(0);  0 - intial value
+    duration: notificationDuration,
+    delay: 0,
+    easing: expoIn
+});                                                                             // $: console.log($progress); // $progress holds the actual tweened value
+
+const logProps = ()=> console.log($$props);                                     // Clicking notfication box logs $$props (only for testing)
+
+$: progressBarValue = $progress;                                                // Holds the live value of progress
+
+$: if( showingNotificationBox) progress.set(100);                               // If notification box is being shown, show progressbar
 
 </script>
 
-<div id="notificationBox" transition:fade="{ {delay: 50, duration: 150 } }">
+<div id="notificationBox" transition:fade="{ {delay: 50, duration: 150 } }" on:click="{ logProps }" >
 
     <a class="" href="javascript:;" on:click={ ()=> dispatch('hideNotificationBox') }>
         <i class="material-icons">close</i>
     </a>
     
     { notificationMsg } 
+
+    <progress id="progressBar" value={ progressBarValue } max="100">sdfsdf 0% </progress>
+
 </div>
 
 <style>
@@ -61,5 +87,9 @@ a i {
 }
 a:hover{
     transform: scale(1.1);
+}
+
+progress{
+    height:4px;
 }
 </style>

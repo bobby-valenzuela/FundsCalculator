@@ -1,7 +1,10 @@
 <script></script>
 
 <header>
-    <h1>Lost Satoshis</h1>
+    <h1>Funds Calculator</h1>
+    <slot>
+        <span>Default value if none passed in</span>
+    </slot>
 </header>
 
 <style>
