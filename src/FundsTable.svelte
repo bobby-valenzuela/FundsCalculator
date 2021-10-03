@@ -33,10 +33,13 @@ const updateFundAmount = idx => {
     editingId = -1;
 };
 
+// Save al funds to local storage
+$: localStorage.setItem('savedFunds', JSON.stringify($Funds));
+
 </script>
 
 {#if $Funds.length === 0}
-    <p>Ain't nothing</p>
+    <p>💵 Add items below to begin... </p>
 {:else}
     <table class="striped">
         <thead>
